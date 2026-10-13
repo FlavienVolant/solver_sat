@@ -4,6 +4,9 @@ use crate::solver::{clause::Clause, formule::Formule, literal::Literal};
 
 mod solver;
 
+#[cfg(test)]
+mod tests;
+
 fn main() {
 
     let formule: Formule = Formule::new(
@@ -17,11 +20,6 @@ fn main() {
             Clause::new(
                 vec!(
                     Literal::new(-1)
-                )
-            ),
-            Clause::new(
-                vec!(
-                    Literal::new(-2)
                 )
             )
         )
