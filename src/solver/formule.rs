@@ -6,6 +6,18 @@ pub struct Formule {
     clauses: Vec<Clause>
 }
 
+macro_rules! formule {
+    ($($($literal:literal)|+),+) => {
+        $crate::solver::formule::Formule::new(vec![
+            $(
+                $crate::solver::clause::clause!($($literal)|+)
+            ),+
+        ])
+    };
+}
+
+pub(crate) use formule;
+
 impl Formule {
     pub fn new(clauses: Vec<Clause>) -> Self {
         Self { clauses }

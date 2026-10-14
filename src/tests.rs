@@ -1,9 +1,10 @@
 
 #[cfg(test)]
 mod tests {
+    use crate::HashMap;
     use std::vec;
 
-use crate::*;
+    use crate::solver::{clause::Clause, formule::Formule, literal::Literal};
 
     #[test]
     fn test_evaluate() {

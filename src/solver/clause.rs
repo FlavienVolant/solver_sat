@@ -6,6 +6,19 @@ pub struct Clause {
     literals: Vec<Literal>
 }
 
+macro_rules! clause {
+
+    ($($literal: literal)|+) => {
+        $crate::solver::clause::Clause::new(vec![
+            $(
+                $crate::solver::literal::Literal::new($literal),
+            )+
+        ])
+    };
+}
+
+pub(crate) use clause;
+
 impl Clause {
     pub fn new(literals: Vec<Literal>) -> Self {
         Self { literals }
