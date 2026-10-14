@@ -17,8 +17,12 @@ impl Literal {
         }
     }
 
-    pub fn get_v(&self) -> i32 {
+    pub fn abs_value(&self) -> i32 {
         self.v.abs()
+    }
+
+    pub fn value(&self) -> i32 {
+        self.v
     }
 }
 

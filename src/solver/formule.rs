@@ -1,6 +1,6 @@
 use std::{collections::{HashMap, HashSet}, fmt::Display};
 
-use crate::solver::clause::Clause;
+use crate::solver::{clause::Clause, literal::Literal};
 
 pub struct Formule {
     clauses: Vec<Clause>
@@ -30,21 +30,24 @@ impl Formule {
         )
     }
 
-    pub fn literals(&self) -> HashSet<i32> {
-        let mut literals = HashSet::new();
+    pub fn variables(&self) -> HashSet<i32> {
+        self.clauses
+            .iter()
+            .flat_map(|clause| clause.variables())
+            .collect()
+    }
 
-        for clause in &self.clauses{
-            for literal in clause.literals() {
-                literals.insert(literal);
-            }
-        }
-
-        literals
+    pub fn find_unit_literals(&self) -> Vec<&Literal> {
+        self.clauses
+            .iter()
+            .filter(|clause| clause.literals().len() == 1)
+            .filter_map(|clause| clause.literals().first())
+            .collect()
     }
 
     pub fn solve(&self) -> Option<HashMap<i32, bool>> {
 
-        let variables = self.literals();
+        let variables = self.variables();
 
         let n = variables.len();
         let nb_assignments = 1usize.checked_shl(n as u32)?;

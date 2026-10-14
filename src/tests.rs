@@ -2,7 +2,7 @@
 #[cfg(test)]
 mod tests {
     use crate::{HashMap, solver::formule::formule};
-    use std::vec;
+    use std::{assert_eq, vec};
 
     use crate::solver::{clause::Clause, formule::Formule, literal::Literal};
 
@@ -46,20 +46,20 @@ mod tests {
     }
 
     #[test]
-    fn test_literals() {
+    fn test_variables() {
         let formule = formule!(
             1 | 2,
             -1,
             -2
         );
 
-        let literals = formule.literals();
+        let variables = formule.variables();
 
-        assert!(literals.len() == 2);
-        assert!(literals.contains(&1));
-        assert!(literals.contains(&2));
-        assert!(!literals.contains(&-1));
-        assert!(!literals.contains(&-2));
+        assert_eq!(variables.len(), 2);
+        assert!(variables.contains(&1));
+        assert!(variables.contains(&2));
+        assert!(!variables.contains(&-1));
+        assert!(!variables.contains(&-2));
     }
 
     #[test]
@@ -79,4 +79,21 @@ mod tests {
         assert!(unsolvable.solve().is_none());
     }
 
+    #[test]
+    fn test_find_unit_clauses() {
+        let formule = formule!(
+            1 | 2,
+            -3,
+            4,
+            -1
+        );
+
+        let unit_literals: Vec<&Literal> = formule.find_unit_literals();
+
+        assert_eq!(unit_literals.len(), 3);
+        assert!(unit_literals.iter().any(|l| l.value() == -3));
+        assert!(unit_literals.iter().any(|l| l.value() == 4));
+        assert!(unit_literals.iter().any(|l| l.value() == -1));
+        assert!(!unit_literals.iter().any(|l| l.value() == 2));
+    }
 }

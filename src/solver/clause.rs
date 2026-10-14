@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt::Display};
+use std::{collections::{HashMap, HashSet}, fmt::Display};
 
 use crate::solver::literal::Literal;
 
@@ -27,15 +27,19 @@ impl Clause {
     pub fn evaluate(&self, map: &HashMap<i32, bool>) -> bool {
         self.literals.iter().any(
             |literal| 
-            literal.evaluate(*map.get(&literal.get_v()).unwrap_or(&true))
+            literal.evaluate(*map.get(&literal.abs_value()).unwrap_or(&true))
         )
     }
 
-    pub fn literals(&self) -> Vec<i32> {
-        self.literals.iter().map(
-            |literal|
-            literal.get_v()
-        ).collect()
+    pub fn literals(&self) -> &[Literal] {
+        &self.literals
+    }
+
+    pub fn variables(&self) -> HashSet<i32> {
+        self.literals
+            .iter()
+            .map(Literal::abs_value)
+            .collect()
     }
 }
 
