@@ -1,7 +1,7 @@
 
 #[cfg(test)]
 mod tests {
-    use crate::HashMap;
+    use crate::{HashMap, solver::formule::formule};
     use std::vec;
 
     use crate::solver::{clause::Clause, formule::Formule, literal::Literal};
@@ -9,20 +9,9 @@ mod tests {
     #[test]
     fn test_evaluate() {
         // (A v B) ^ -A
-        let formule: Formule = Formule::new(
-            vec!(
-                Clause::new(
-                    vec!(
-                        Literal::new(1),
-                        Literal::new(2)
-                    )
-                ),
-                Clause::new(
-                    vec!(
-                        Literal::new(-1)
-                    )
-                )
-            )
+        let formule = formule!(
+            1 | 2,
+            -1
         );
 
         let mut succed = HashMap::new();
@@ -40,15 +29,7 @@ mod tests {
 
     #[test]
     fn test_evaluate_when_no_value_is_specified_for_a_literal_default_value_is_true() {
-        let a = Formule::new(
-            vec!(
-                Clause::new(
-                    vec!(
-                        Literal::new(1)
-                    )
-                )
-            )
-        );
+        let a = formule!(1);
 
         let not_a = Formule::new(
             vec!(
@@ -66,25 +47,10 @@ mod tests {
 
     #[test]
     fn test_literals() {
-        let formule: Formule = Formule::new(
-            vec!(
-                Clause::new(
-                    vec!(
-                        Literal::new(1),
-                        Literal::new(2)
-                    )
-                ),
-                Clause::new(
-                    vec!(
-                        Literal::new(-1)
-                    )
-                ),
-                Clause::new(
-                    vec!(
-                        Literal::new(-2)
-                    )
-                )
-            )
+        let formule = formule!(
+            1 | 2,
+            -1,
+            -2
         );
 
         let literals = formule.literals();
@@ -98,25 +64,16 @@ mod tests {
 
     #[test]
     fn test_solve() {
-        let solvable = Formule::new(vec![
-            Clause::new(vec![
-                Literal::new(1),
-                Literal::new(2),
-            ]),
-            Clause::new(vec![
-                Literal::new(-1),
-                Literal::new(3),
-            ]),
-            Clause::new(vec![
-                Literal::new(-2),
-                Literal::new(3),
-            ]),
-        ]);
+        let solvable = formule!(
+            1 | 2,
+            -1 | 3,
+            -2 | 3
+        );
 
-        let unsolvable = Formule::new(vec![
-            Clause::new(vec![Literal::new(1)]),
-            Clause::new(vec![Literal::new(-1)]),
-        ]);
+        let unsolvable = formule!(
+            1,
+            -1
+        );
 
         assert!(solvable.solve().is_some());
         assert!(unsolvable.solve().is_none());
