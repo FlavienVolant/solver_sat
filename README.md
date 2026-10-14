@@ -2,7 +2,7 @@
 
 Blazingly fast O(2^n) sat solver.
 
-## How to
+## How to
 
 ```
 cargo run
