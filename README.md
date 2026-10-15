@@ -61,9 +61,10 @@ let formula = formule!(
 
 This creates the following formula:
 
-\[
+$$
 (A \lor B) \land (\neg A \lor C) \land (\neg B \lor \neg C)
-\]
+$$
+
 
 Each integer represents a Boolean variable.
 
@@ -148,9 +149,9 @@ CNF is a way to represent Boolean formulas using two operations:
 
 For example:
 
-\[
+$$
 (A \lor B) \land (\neg A \lor C)
-\]
+$$
 
 is in CNF.
 
@@ -175,12 +176,6 @@ If no assignment satisfies the formula, the solver returns `None`.
 
 The current solving algorithm uses exhaustive search.
 
-For a formula with `n` unassigned variables, it may need to explore up to:
-
-\[
-2^n
-\]
-
-possible assignments.
+For a formula with `n` unassigned variables, it may need to explore up to $2^n$ possible assignments.
 
 Unit propagation can reduce the number of variables that need to be explored, but the worst-case complexity remains exponential.
