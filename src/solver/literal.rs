@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+#[derive(Clone)]
 pub struct Literal {
     v: i32
 }

@@ -2,6 +2,7 @@ use std::{collections::{HashMap, HashSet}, fmt::Display};
 
 use crate::solver::{clause::Clause, literal::Literal};
 
+#[derive(Clone)]
 pub struct Formule {
     clauses: Vec<Clause>
 }
@@ -37,12 +38,57 @@ impl Formule {
             .collect()
     }
 
+    pub fn clauses(&self) -> &[Clause] {
+        &self.clauses
+    }
+
     pub fn find_unit_literals(&self) -> Vec<&Literal> {
         self.clauses
             .iter()
             .filter(|clause| clause.literals().len() == 1)
             .filter_map(|clause| clause.literals().first())
             .collect()
+    }
+
+    pub fn reduce(&self, map: &HashMap<i32, bool>) -> Formule {
+        
+        Formule::new(
+            self.clauses
+                .iter()
+                .filter_map(|clause| clause.reduce(map))
+                .collect()
+        )
+    }
+
+    pub fn as_empty_clause(&self) -> bool {
+        self.clauses.iter()
+            .any(|clause| clause.literals().is_empty())
+    }
+
+    pub fn propagate_units(&self) -> Formule {
+
+        let unit_literals = self.find_unit_literals();
+
+        if unit_literals.is_empty() {
+            return self.clone();
+        }
+
+        let mut map = HashMap::new();
+
+        for literal in unit_literals {
+            map.insert(
+                literal.abs_value(),
+                literal.value() > 0,
+            );
+        }
+
+        let reduced = self.reduce(&map);
+
+        if reduced.as_empty_clause() {
+            return reduced;
+        }
+
+        reduced.propagate_units()
     }
 
     pub fn solve(&self) -> Option<HashMap<i32, bool>> {

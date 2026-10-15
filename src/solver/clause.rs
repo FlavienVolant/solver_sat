@@ -2,6 +2,7 @@ use std::{collections::{HashMap, HashSet}, fmt::Display};
 
 use crate::solver::literal::Literal;
 
+#[derive(Clone)]
 pub struct Clause {
     literals: Vec<Literal>
 }
@@ -29,6 +30,23 @@ impl Clause {
             |literal| 
             literal.evaluate(*map.get(&literal.abs_value()).unwrap_or(&true))
         )
+    }
+
+    pub fn reduce(&self, map: &HashMap<i32, bool>) -> Option<Clause> {
+
+        self.literals.iter()
+            .try_fold(
+                Vec::new(), 
+                |mut reduced, literal|
+                match map.get(&literal.abs_value()){
+                    Some(boolean) if literal.evaluate(*boolean) => None,
+                    Some(_) => Some(reduced),
+                    None => {
+                        reduced.push(literal.clone());
+                        Some(reduced)
+                    },
+                })
+            .map(Clause::new)
     }
 
     pub fn literals(&self) -> &[Literal] {
