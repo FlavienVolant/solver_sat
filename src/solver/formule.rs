@@ -65,7 +65,7 @@ impl Formule {
             .any(|clause| clause.literals().is_empty())
     }
 
-    pub fn propagate_units(&self) -> Formule {
+    pub fn propagate_units(&self, assignments: &mut HashMap<i32, bool>) -> Formule {
 
         let unit_literals = self.find_unit_literals();
 
@@ -73,40 +73,48 @@ impl Formule {
             return self.clone();
         }
 
-        let mut map = HashMap::new();
-
         for literal in unit_literals {
-            map.insert(
+
+            if assignments.contains_key(&literal.abs_value()) {
+                continue;
+            }
+
+            assignments.insert(
                 literal.abs_value(),
                 literal.value() > 0,
             );
         }
 
-        let reduced = self.reduce(&map);
+        let reduced = self.reduce(&assignments);
 
         if reduced.as_empty_clause() {
             return reduced;
         }
 
-        reduced.propagate_units()
+        reduced.propagate_units(assignments)
     }
 
     pub fn solve(&self) -> Option<HashMap<i32, bool>> {
 
-        let variables = self.variables();
+        let mut solution: HashMap<i32, bool> = HashMap::new();
+        let reduced = self.propagate_units(&mut solution);
+
+        if reduced.as_empty_clause() {
+            return None
+        }
+
+        let variables = reduced.variables();
 
         let n = variables.len();
         let nb_assignments = 1usize.checked_shl(n as u32)?;
 
-        for counter in 0..nb_assignments {
-            let mut solution: HashMap<i32, bool> = HashMap::new();
-            
+        for counter in 0..nb_assignments {            
             for (i, variable) in variables.iter().enumerate() {
                 let value = ((counter >> i) & 1) == 0;
                 solution.insert(*variable, value);
             }
 
-            if self.evaluate(&solution) {
+            if reduced.evaluate(&solution) {
                 return Some(solution)
             }
         }

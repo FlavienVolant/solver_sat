@@ -181,9 +181,11 @@ mod tests {
             2 | -3
         );
 
-        let propagated = formule.propagate_units();
+        let mut map = HashMap::new();
+        let propagated = formule.propagate_units(&mut map);
 
         assert_eq!(propagated.to_string(), formule.to_string());
+        assert!(map.is_empty());
     }
 
     #[test]
@@ -194,9 +196,14 @@ mod tests {
             -2 | 3
         );
 
-        let propagated = formule.propagate_units();
+        let mut map = HashMap::new();
+        let propagated = formule.propagate_units(&mut map);
 
         assert!(propagated.clauses().is_empty());
+        assert_eq!(map.len(), 3);
+        assert!(map.contains_key(&1));
+        assert!(map.contains_key(&2));
+        assert!(map.contains_key(&3));
     }
 
     #[test]
@@ -207,8 +214,35 @@ mod tests {
             -2
         );
 
-        let propagated = formule.propagate_units();
+        let propagated = formule.propagate_units(&mut HashMap::new());
 
         assert!(propagated.as_empty_clause());
+    }
+
+    #[test]
+    fn test_solve_more() {
+        let a = formule!(1);
+        let a_option_solution = a.solve();
+        assert!(a_option_solution.is_some());
+        let a_solution = a_option_solution.unwrap();
+        assert!(a_solution.contains_key(&1));
+        assert_eq!(a_solution.get(&1).unwrap(), &true);
+
+        let b = formule!(1, -1);
+        let b_option_solution = b.solve();
+        assert!(b_option_solution.is_none());
+        
+        let c = formule!(1 | 2, -1 | 2, 1 | -2);
+        let c_option_solution = c.solve();
+        assert!(c_option_solution.is_some());
+        let c_solution = c_option_solution.unwrap();
+        assert!(c_solution.contains_key(&1));
+        assert!(c_solution.contains_key(&2));
+        assert_eq!(c_solution.get(&1).unwrap(), &true);
+        assert_eq!(c_solution.get(&2).unwrap(), &true);
+
+        let d = formule!(1 | 2, 1 | -2, -1 | 2, -1 | -2);
+        let d_option_solution = d.solve();
+        assert!(d_option_solution.is_none());
     }
 }

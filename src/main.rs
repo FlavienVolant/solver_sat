@@ -10,11 +10,13 @@ mod tests;
 fn main() {
 
     let formule = formule!(
-        1 | 2 | 3,
-        -1
+        1,
+        -1 | 2
     );
+
+    println!("{}", formule);
 
     let map: HashMap<i32, bool> = formule.solve().unwrap();
 
-    println!("{} {:?}", formule, map);
+    println!("{:?}", map);
 }
